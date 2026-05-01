@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product — Luster Looks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: #faf8f5; color: #1a1a1a; -webkit-font-smoothing: antialiased; }
+    img { display: block; object-fit: cover; }
+    a { text-decoration: none; color: inherit; }
+ 
+    :root {
+      --gold: #c9a96e;
+      --dark: #1a1208;
+      --cream: #faf8f5;
+      --border: #e8e0d4;
+      --text-muted: #888;
+      --page-pad: 48px;
+    }
+ 
+    /* ── Announcement Bar ── */
+    .announce {
+      background: #1a1a1a; color: #e8d5b0;
+      text-align: center; font-size: 11px; letter-spacing: .14em;
+      padding: 9px 16px; text-transform: uppercase;
+    }
+ 
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px var(--page-pad); background: var(--cream);
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 200;
+    }
+    .nav-left { display: flex; gap: 28px; }
+    .nav-left a { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif; font-size: 22px; letter-spacing: .14em;
+      position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;
+    }
+    .nav-right { display: flex; gap: 20px; align-items: center; }
+    .nav-right svg {
+      width: 19px; height: 19px; cursor: pointer;
+      stroke: #1a1a1a; fill: none; stroke-width: 1.5;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .cart-wrap { position: relative; cursor: pointer; }
+    .cart-count {
+      position: absolute; top: -7px; right: -7px;
+      background: var(--gold); color: var(--dark);
+      font-size: 9px; font-weight: 700; width: 16px; height: 16px;
+      border-radius: 50%; display: none; align-items: center; justify-content: center;
+    }
+    .cart-count.visible { display: flex; }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: #1a1a1a; }
+    .mobile-menu {
+      display: none; flex-direction: column; background: var(--cream);
+      border-bottom: 1px solid var(--border); padding: 20px var(--page-pad); gap: 18px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+ 
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      padding: 18px var(--page-pad) 0;
+      font-size: 11px; letter-spacing: .08em; color: var(--text-muted);
+    }
+    .breadcrumb a { color: var(--text-muted); transition: color .2s; }
+    .breadcrumb a:hover { color: var(--gold); }
+    .breadcrumb span { margin: 0 6px; }
+ 
+    /* ── Product Layout ── */
+    .product-page {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px var(--page-pad) 80px;
+    }
+ 
+    /* ── Image Gallery ── */
+    .product-gallery {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+      padding-right: 48px;
+    }
+    .gallery-main {
+      width: 100%;
+      aspect-ratio: 2/3;
+      background: #ede8e0;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .gallery-main img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: opacity .3s;
+    }
+    .gallery-thumbs {
+      display: flex; gap: 8px;
+    }
+    .gallery-thumb {
+      width: 70px; height: 90px;
+      background: #ede8e0; overflow: hidden; cursor: pointer;
+      border: 2px solid transparent; transition: border-color .2s;
+      flex-shrink: 0;
+    }
+    .gallery-thumb.active { border-color: var(--gold); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+ 
+    /* ── Product Details ── */
+    .product-details { padding-top: 8px; }
+ 
+    .product-badge {
+      display: inline-block;
+      font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 12px;
+    }
+    .product-details h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px; font-weight: 400; letter-spacing: .03em; line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .product-details .price {
+      font-size: 22px; font-weight: 600; letter-spacing: .04em;
+      margin-bottom: 24px;
+    }
+    .product-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
+ 
+    .product-desc-full {
+      font-size: 13px; line-height: 1.8; color: #444;
+      margin-bottom: 28px; letter-spacing: .02em;
+    }
+ 
+    /* Variant selector */
+    .variant-label {
+      font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 10px; display: block;
+    }
+    .variant-options {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .variant-btn {
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      background: none; cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px; letter-spacing: .06em;
+      transition: border-color .2s, background .2s, color .2s;
+    }
+    .variant-btn:hover { border-color: var(--gold); }
+    .variant-btn.selected { background: var(--dark); color: #e8d5b0; border-color: var(--dark); }
+ 
+    /* Quantity */
+    .qty-label {
+      font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 10px; display: block;
+    }
+    .qty-wrap {
+      display: flex; align-items: center; gap: 0; margin-bottom: 24px;
+      border: 1px solid var(--border); width: fit-content;
+    }
+    .qty-btn-lg {
+      background: none; border: none; width: 44px; height: 44px;
+      cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .qty-btn-lg:hover { background: #f0ece5; }
+    .qty-display { width: 44px; text-align: center; font-size: 14px; font-weight: 500; }
+ 
+    /* Add to cart button */
+    .btn-add-to-cart {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px;
+      background: var(--dark); color: #e8d5b0;
+      border: none; cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600;
+      transition: background .25s, color .25s;
+      margin-bottom: 12px;
+      position: relative; overflow: hidden;
+    }
+    .btn-add-to-cart:hover { background: var(--gold); color: var(--dark); }
+    .btn-add-to-cart.added { background: #2a5a2a; color: #fff; }
+    .btn-add-to-cart svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+ 
+    .btn-wishlist {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px;
+      background: none; color: #1a1a1a;
+      border: 1px solid var(--border); cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 500;
+      transition: border-color .2s, color .2s;
+      margin-bottom: 28px;
+    }
+    .btn-wishlist:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-wishlist svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+ 
+    /* Product features */
+    .product-features { margin-bottom: 28px; }
+    .product-feature {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px; color: #555; letter-spacing: .02em; line-height: 1.6;
+    }
+    .product-feature:first-child { border-top: 1px solid var(--border); }
+    .feature-icon { color: var(--gold); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+ 
+    /* ── Sticky Add to Cart bar ── */
+    .sticky-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--cream);
+      border-top: 1px solid var(--border);
+      padding: 14px var(--page-pad);
+      display: flex; align-items: center; gap: 20px;
+      z-index: 300;
+      transform: translateY(100%);
+      transition: transform .3s ease;
+      box-shadow: 0 -4px 24px rgba(0,0,0,.08);
+    }
+    .sticky-bar.visible { transform: translateY(0); }
+    .sticky-bar-img {
+      width: 48px; height: 60px; background: #ede8e0; overflow: hidden; flex-shrink: 0;
+    }
+    .sticky-bar-img img { width: 100%; height: 100%; object-fit: cover; }
+    .sticky-bar-info { flex: 1; }
+    .sticky-bar-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; }
+    .sticky-bar-price { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .sticky-bar-btn {
+      background: var(--dark); color: #e8d5b0;
+      border: none; padding: 12px 28px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      white-space: nowrap;
+    }
+    .sticky-bar-btn:hover { background: var(--gold); color: var(--dark); }
+ 
+    /* ── Cart Drawer ── */
+    .cart-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      z-index: 998; opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+    .cart-drawer {
+      position: fixed; top: 0; right: 0; width: 380px; max-width: 100vw; height: 100%;
+      background: var(--cream); z-index: 999;
+      transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+    }
+    .cart-drawer.open { transform: translateX(0); }
+    .cart-drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 24px; border-bottom: 1px solid var(--border);
+    }
+    .cart-drawer-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; letter-spacing: .06em; }
+    .cart-close { cursor: pointer; background: none; border: none; font-size: 22px; color: #1a1a1a; padding: 4px; }
+    .cart-items { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .cart-empty { text-align: center; padding: 60px 0; font-size: 12px; color: var(--text-muted); letter-spacing: .08em; }
+    .cart-item {
+      display: grid; grid-template-columns: 80px 1fr auto;
+      gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: start;
+    }
+    .cart-item-img { width: 80px; height: 100px; background: #ede8e0; overflow: hidden; }
+    .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; margin-bottom: 4px; }
+    .cart-item-price { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .qty-btn { background: none; border: 1px solid var(--border); width: 24px; height: 24px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: border-color .2s; }
+    .qty-btn:hover { border-color: var(--gold); }
+    .qty-num { font-size: 12px; min-width: 20px; text-align: center; }
+    .cart-item-remove { background: none; border: none; cursor: pointer; color: #bbb; font-size: 18px; padding: 2px; transition: color .2s; }
+    .cart-item-remove:hover { color: #1a1a1a; }
+    .cart-footer { padding: 20px 24px 28px; border-top: 1px solid var(--border); }
+    .cart-total { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+    .cart-total span:first-child { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; }
+    .btn-checkout {
+      display: block; width: 100%; background: var(--dark); color: #e8d5b0;
+      border: none; padding: 15px; font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-checkout:hover { background: var(--gold); color: var(--dark); }
+ 
+    /* ── Footer ── */
+    footer { background: var(--dark); color: #e8d5b0; padding: 56px var(--page-pad) 28px; }
+    .footer-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; letter-spacing: .12em; margin-bottom: 12px; }
+    .footer-brand p { font-size: 12.5px; color: #9a8a6a; line-height: 1.75; max-width: 230px; }
+    .footer-col h4 { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #6a5a3a; margin-bottom: 16px; font-weight: 500; }
+    .footer-col a { display: block; color: #b8a880; font-size: 13px; margin-bottom: 10px; letter-spacing: .02em; transition: color .2s; }
+    .footer-col a:hover { color: #e8d5b0; }
+    .footer-newsletter input { background: rgba(255,255,255,.06); border: 1px solid rgba(201,169,110,.25); color: #e8d5b0; padding: 11px 14px; font-size: 12px; width: 100%; margin-bottom: 8px; font-family: 'Montserrat', sans-serif; outline: none; letter-spacing: .04em; }
+    .footer-newsletter input::placeholder { color: #4a3a1a; }
+    .footer-newsletter button { background: var(--gold); color: var(--dark); border: none; padding: 11px 20px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; width: 100%; transition: opacity .2s; }
+    .footer-newsletter button:hover { opacity: .85; }
+    .footer-bottom { border-top: 1px solid rgba(201,169,110,.12); padding-top: 22px; font-size: 11px; color: #4a3a1a; text-align: center; letter-spacing: .06em; }
+ 
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      :root { --page-pad: 28px; }
+      .product-page { grid-template-columns: 1fr; gap: 36px; }
+      .product-gallery { position: static; padding-right: 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 600px) {
+      :root { --page-pad: 18px; }
+      .nav-left, .nav-right { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-logo { font-size: 18px; }
+      .product-details h1 { font-size: 32px; }
+      .gallery-main { aspect-ratio: 3/4; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      footer { padding: 44px var(--page-pad) 24px; }
+      .sticky-bar { padding: 12px 18px; }
+      .cart-drawer { width: 100vw; }
+    }
+  </style>
+</head>
+<body>
+ 
+  <div class="announce">Free shipping on orders over $150 · Authentic Bengali Sarees</div>
+ 
+  <nav>
+    <div class="nav-left">
+      <a href="index.html#products">Shop</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <a href="index.html" class="nav-logo">Luster Looks</a>
+    <div class="nav-right">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="cart-wrap" onclick="openCart()">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </div>
+    </div>
+    <div class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+ 
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#products" onclick="toggleMenu()">Shop</a>
+    <a href="index.html#contact" onclick="toggleMenu()">Contact</a>
+  </div>
+ 
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>/</span>
+    <a href="index.html#products">Shop</a>
+    <span>/</span>
+    <span id="breadcrumbName">Product</span>
+  </div>
+ 
+  <!-- ── Product Page ── -->
+  <div class="product-page">
+ 
+    <!-- Gallery -->
+    <div class="product-gallery">
+      <div class="gallery-main" id="galleryMain">
+        <img id="mainImage" src="" alt="" onerror="this.parentNode.style.background='#ede8e0';this.style.display='none'" />
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+    </div>
+ 
+    <!-- Details -->
+    <div class="product-details">
+      <span class="product-badge">Handcrafted · Bengali Heritage</span>
+      <h1 id="productName">Loading...</h1>
+      <div class="price" id="productPrice">—</div>
+      <hr class="product-divider" />
+      <p class="product-desc-full" id="productDesc"></p>
+ 
+      <!-- Size variant -->
+      <span class="variant-label">Size</span>
+      <div class="variant-options" id="variantOptions">
+        <button class="variant-btn selected" onclick="selectVariant(this)">Free Size</button>
+        <button class="variant-btn" onclick="selectVariant(this)">Petite</button>
+        <button class="variant-btn" onclick="selectVariant(this)">Plus</button>
+      </div>
+ 
+      <!-- Quantity -->
+      <span class="qty-label">Quantity</span>
+      <div class="qty-wrap">
+        <button class="qty-btn-lg" onclick="changeQtyPDP(-1)">−</button>
+        <span class="qty-display" id="qtyDisplay">1</span>
+        <button class="qty-btn-lg" onclick="changeQtyPDP(1)">+</button>
+      </div>
+ 
+      <!-- Add to Cart -->
+      <button class="btn-add-to-cart" id="addToCartBtn" onclick="addToCart()">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Add to Cart
+      </button>
+      <button class="btn-wishlist">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Save to Wishlist
+      </button>
+ 
+      <!-- Features -->
+      <div class="product-features">
+        <div class="product-feature">
+          <span class="feature-icon">✦</span>
+          <span>Free shipping on orders over $150. Delivered within 7–14 business days.</span>
+        </div>
+        <div class="product-feature">
+          <span class="feature-icon">✦</span>
+          <span>Authentic handcrafted Bengali saree. Each piece is unique and may have slight natural variations.</span>
+        </div>
+        <div class="product-feature">
+          <span class="feature-icon">✦</span>
+          <span>Easy 30-day returns. Contact us and we'll make it right.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── Sticky Add to Cart Bar ── -->
+  <div class="sticky-bar" id="stickyBar">
+    <div class="sticky-bar-img">
+      <img id="stickyImg" src="" alt="" onerror="this.style.display='none'" />
+    </div>
+    <div class="sticky-bar-info">
+      <div class="sticky-bar-name" id="stickyName"></div>
+      <div class="sticky-bar-price" id="stickyPrice"></div>
+    </div>
+    <button class="sticky-bar-btn" onclick="addToCart()">Add to Cart</button>
+  </div>
+ 
+  <!-- ── Cart Drawer ── -->
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h3>Your Cart</h3>
+      <button class="cart-close" onclick="closeCart()">&#x2715;</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button class="btn-checkout">Proceed to Checkout</button>
+    </div>
+  </div>
+ 
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Luster Looks</div>
+        <p>Celebrating Bengali heritage through handcrafted sarees for every occasion — weddings, festivals, and everyday elegance.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="index.html#products">All Sarees</a>
+        <a href="index.html#products">Silk Sarees</a>
+        <a href="index.html#products">Cotton Sarees</a>
+        <a href="index.html#products">Bridal Collection</a>
+        <a href="index.html#products">New Arrivals</a>
+      </div>
+      <div class="footer-col footer-newsletter">
+        <h4>Join Our List</h4>
+        <input type="email" placeholder="Your email address" />
+        <button type="button">Subscribe</button>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 Luster Looks. All rights reserved.</div>
+  </footer>
+ 
+  <script>
+    /* ─── Load product from URL param ─── */
+    const params = new URLSearchParams(window.location.search);
+    const productId = parseInt(params.get('id'));
+ 
+    // Products array — keep in sync with index.html
+    const products = JSON.parse(sessionStorage.getItem('lusterlooks_products') || '[]').length
+      ? JSON.parse(sessionStorage.getItem('lusterlooks_products'))
+      : [
+          { id: 1, name: "Crimson Banarasi Silk", price: 145.00, description: "Rich crimson pure silk with gold zari border, perfect for weddings and grand occasions.", image: "images/saree1.jpg" },
+          { id: 2, name: "Royal Blue Tant", price: 95.00, description: "Lightweight Bengal tant weave with traditional blue on white motifs. Ideal for festivals.", image: "images/saree2.jpg" },
+          { id: 3, name: "Emerald Muslin", price: 110.00, description: "Soft Dhaka muslin with delicate hand-embroidered thread work along the border.", image: "images/saree3.jpg" },
+          { id: 4, name: "Golden Jamdani", price: 165.00, description: "Handwoven Jamdani with intricate traditional floral motifs. A true heirloom piece.", image: "images/saree4.jpg" }
+        ];
+ 
+    const product = products.find(p => p.id === productId) || products[0];
+ 
+    // Populate page
+    document.title = product.name + ' — Luster Looks';
+    document.getElementById('breadcrumbName').textContent = product.name;
+    document.getElementById('productName').textContent = product.name;
+    document.getElementById('productPrice').textContent = '$' + product.price.toFixed(2);
+    document.getElementById('productDesc').textContent = product.description;
+ 
+    // Gallery
+    const mainImg = document.getElementById('mainImage');
+    mainImg.src = product.image;
+    mainImg.alt = product.name;
+ 
+    // Thumbnails — show same image multiple times as placeholders
+    // Replace these src values with your actual extra images e.g. "images/saree1-b.jpg"
+    const thumbImages = [product.image, product.image, product.image];
+    const thumbsEl = document.getElementById('galleryThumbs');
+    thumbImages.forEach((src, i) => {
+      const t = document.createElement('div');
+      t.className = 'gallery-thumb' + (i === 0 ? ' active' : '');
+      t.innerHTML = `<img src="${src}" alt="${product.name}" onerror="this.parentNode.style.display='none'" />`;
+      t.addEventListener('click', () => {
+        mainImg.src = src;
+        document.querySelectorAll('.gallery-thumb').forEach(el => el.classList.remove('active'));
+        t.classList.add('active');
+      });
+      thumbsEl.appendChild(t);
+    });
+ 
+    // Sticky bar
+    document.getElementById('stickyImg').src = product.image;
+    document.getElementById('stickyName').textContent = product.name;
+    document.getElementById('stickyPrice').textContent = '$' + product.price.toFixed(2);
+ 
+    // Sticky bar visibility on scroll
+    const addBtn = document.getElementById('addToCartBtn');
+    const stickyBar = document.getElementById('stickyBar');
+    const observer = new IntersectionObserver(entries => {
+      stickyBar.classList.toggle('visible', !entries[0].isIntersecting);
+    }, { threshold: 0.5 });
+    observer.observe(addBtn);
+ 
+    /* ─── Quantity on PDP ─── */
+    let qty = 1;
+    function changeQtyPDP(delta) {
+      qty = Math.max(1, qty + delta);
+      document.getElementById('qtyDisplay').textContent = qty;
+    }
+ 
+    /* ─── Variant selector ─── */
+    function selectVariant(btn) {
+      document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+ 
+    /* ─── Cart system ─── */
+    function getCart() { return JSON.parse(localStorage.getItem('lusterlooks_cart') || '[]'); }
+    function saveCart(cart) { localStorage.setItem('lusterlooks_cart', JSON.stringify(cart)); updateCartCount(); }
+    function updateCartCount() {
+      const cart = getCart();
+      const total = cart.reduce((s, i) => s + i.qty, 0);
+      const el = document.getElementById('cartCount');
+      el.textContent = total;
+      el.classList.toggle('visible', total > 0);
+    }
+ 
+    function addToCart() {
+      const cart = getCart();
+      const existing = cart.find(i => i.id === product.id);
+      if (existing) { existing.qty += qty; }
+      else { cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, qty }); }
+      saveCart(cart);
+ 
+      // Button feedback
+      const btn = document.getElementById('addToCartBtn');
+      btn.textContent = '✓ Added to Cart';
+      btn.classList.add('added');
+      setTimeout(() => {
+        btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Add to Cart`;
+        btn.classList.remove('added');
+      }, 2000);
+ 
+      openCart();
+    }
+ 
+    function openCart() {
+      renderCartDrawer();
+      document.getElementById('cartDrawer').classList.add('open');
+      document.getElementById('cartOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCart() {
+      document.getElementById('cartDrawer').classList.remove('open');
+      document.getElementById('cartOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function renderCartDrawer() {
+      const cart = getCart();
+      const itemsEl = document.getElementById('cartItems');
+      const footerEl = document.getElementById('cartFooter');
+      if (cart.length === 0) {
+        itemsEl.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
+        footerEl.style.display = 'none';
+        return;
+      }
+      footerEl.style.display = 'block';
+      let total = 0;
+      itemsEl.innerHTML = cart.map((item, idx) => {
+        total += item.price * item.qty;
+        return `
+          <div class="cart-item">
+            <div class="cart-item-img"><img src="${item.image}" alt="${item.name}" onerror="this.style.display='none'" /></div>
+            <div>
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+              <div class="cart-item-qty">
+                <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+                <span class="qty-num">${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+              </div>
+            </div>
+            <button class="cart-item-remove" onclick="removeItem(${idx})">&#x2715;</button>
+          </div>`;
+      }).join('');
+      document.getElementById('cartTotal').textContent = '$' + total.toFixed(2);
+    }
+    function changeQty(idx, delta) {
+      const cart = getCart(); cart[idx].qty = Math.max(1, cart[idx].qty + delta);
+      saveCart(cart); renderCartDrawer();
+    }
+    function removeItem(idx) {
+      const cart = getCart(); cart.splice(idx, 1);
+      saveCart(cart); renderCartDrawer();
+    }
+ 
+    function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+ 
+    updateCartCount();
+  </script>
+</body>
+</html>
+ 
