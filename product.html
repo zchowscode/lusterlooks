@@ -352,7 +352,6 @@
     <a href="index.html#contact" onclick="toggleMenu()">Contact</a>
   </div>
  
-  <!-- Breadcrumb -->
   <div class="breadcrumb">
     <a href="index.html">Home</a>
     <span>/</span>
@@ -361,10 +360,8 @@
     <span id="breadcrumbName">Product</span>
   </div>
  
-  <!-- ── Product Page ── -->
   <div class="product-page">
  
-    <!-- Gallery -->
     <div class="product-gallery">
       <div class="gallery-main" id="galleryMain">
         <img id="mainImage" src="" alt="" onerror="this.parentNode.style.background='#ede8e0';this.style.display='none'" />
@@ -372,7 +369,6 @@
       <div class="gallery-thumbs" id="galleryThumbs"></div>
     </div>
  
-    <!-- Details -->
     <div class="product-details">
       <span class="product-badge">Handcrafted · Bengali Heritage</span>
       <h1 id="productName">Loading...</h1>
@@ -380,7 +376,6 @@
       <hr class="product-divider" />
       <p class="product-desc-full" id="productDesc"></p>
  
-      <!-- Size variant -->
       <span class="variant-label">Size</span>
       <div class="variant-options" id="variantOptions">
         <button class="variant-btn selected" onclick="selectVariant(this)">Free Size</button>
@@ -388,7 +383,6 @@
         <button class="variant-btn" onclick="selectVariant(this)">Plus</button>
       </div>
  
-      <!-- Quantity -->
       <span class="qty-label">Quantity</span>
       <div class="qty-wrap">
         <button class="qty-btn-lg" onclick="changeQtyPDP(-1)">−</button>
@@ -396,7 +390,6 @@
         <button class="qty-btn-lg" onclick="changeQtyPDP(1)">+</button>
       </div>
  
-      <!-- Add to Cart -->
       <button class="btn-add-to-cart" id="addToCartBtn" onclick="addToCart()">
         <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Add to Cart
@@ -406,7 +399,6 @@
         Save to Wishlist
       </button>
  
-      <!-- Features -->
       <div class="product-features">
         <div class="product-feature">
           <span class="feature-icon">✦</span>
@@ -424,7 +416,6 @@
     </div>
   </div>
  
-  <!-- ── Sticky Add to Cart Bar ── -->
   <div class="sticky-bar" id="stickyBar">
     <div class="sticky-bar-img">
       <img id="stickyImg" src="" alt="" onerror="this.style.display='none'" />
@@ -436,7 +427,6 @@
     <button class="sticky-bar-btn" onclick="addToCart()">Add to Cart</button>
   </div>
  
-  <!-- ── Cart Drawer ── -->
   <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
   <div class="cart-drawer" id="cartDrawer">
     <div class="cart-drawer-header">
@@ -449,11 +439,10 @@
         <span>Total</span>
         <span id="cartTotal">$0.00</span>
       </div>
-      <button class="btn-checkout">Proceed to Checkout</button>
+      <button class="btn-checkout" onclick="placeOrder()">Proceed to Checkout</button>
     </div>
   </div>
  
-  <!-- ── Footer ── -->
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
@@ -506,8 +495,7 @@
     mainImg.src = product.image;
     mainImg.alt = product.name;
  
-    // Thumbnails — show same image multiple times as placeholders
-    // Replace these src values with your actual extra images e.g. "images/saree1-b.jpg"
+    // Thumbnails
     const thumbImages = [product.image, product.image, product.image];
     const thumbsEl = document.getElementById('galleryThumbs');
     thumbImages.forEach((src, i) => {
@@ -555,15 +543,29 @@
       const cart = getCart();
       const total = cart.reduce((s, i) => s + i.qty, 0);
       const el = document.getElementById('cartCount');
-      el.textContent = total;
-      el.classList.toggle('visible', total > 0);
+      if(el) {
+        el.textContent = total;
+        el.classList.toggle('visible', total > 0);
+      }
     }
  
     function addToCart() {
       const cart = getCart();
-      const existing = cart.find(i => i.id === product.id);
-      if (existing) { existing.qty += qty; }
-      else { cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, qty }); }
+      const selectedVariant = document.querySelector('.variant-btn.selected')?.innerText || 'Standard';
+      const existing = cart.find(i => i.id === product.id && i.variant === selectedVariant);
+      
+      if (existing) { 
+        existing.qty += qty; 
+      } else { 
+        cart.push({ 
+          id: product.id, 
+          name: product.name, 
+          price: product.price, 
+          image: product.image, 
+          qty: qty,
+          variant: selectedVariant 
+        }); 
+      }
       saveCart(cart);
  
       // Button feedback
@@ -606,7 +608,7 @@
           <div class="cart-item">
             <div class="cart-item-img"><img src="${item.image}" alt="${item.name}" onerror="this.style.display='none'" /></div>
             <div>
-              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-name">${item.name} (${item.variant})</div>
               <div class="cart-item-price">$${item.price.toFixed(2)}</div>
               <div class="cart-item-qty">
                 <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
@@ -630,8 +632,45 @@
  
     function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
  
+    /* ─── BACKEND CONNECTION (PLACE ORDER) ─── */
+    async function placeOrder() {
+      const cart = getCart();
+      if (cart.length === 0) return alert("Cart is empty");
+
+      const name = prompt("Enter your name for the order:");
+      const phone = prompt("Enter your phone number:");
+
+      if (!name || !phone) {
+        alert("Name and phone are required to place an order!");
+        return;
+      }
+
+      // We create a list of products in the cart for the message
+      const productSummary = cart.map(item => `${item.name} (${item.variant}) x${item.qty}`).join(', ');
+
+      const res = await fetch("https://lusterlooks-backend.onrender.com/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: name, 
+          phone: phone, 
+          product: productSummary 
+        }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert("Order received! We will contact you soon.");
+        localStorage.removeItem('lusterlooks_cart'); // Clear cart after success
+        updateCartCount();
+        closeCart();
+      } else {
+        alert("Error placing order. Please try again.");
+      }
+    }
+
     updateCartCount();
   </script>
 </body>
 </html>
- 
