@@ -1,9 +1,591 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Clothing Brand</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luster Looks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: #faf8f5; color: #1a1a1a; -webkit-font-smoothing: antialiased; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    a { text-decoration: none; color: inherit; }
+ 
+    /* ── CSS Variables ── */
+    :root {
+      --gold: #c9a96e;
+      --dark: #1a1208;
+      --cream: #faf8f5;
+      --border: #e8e0d4;
+      --text-muted: #888;
+      --page-pad: 48px;
+    }
+ 
+    /* ── Announcement Bar ── */
+    .announce {
+      background: #1a1a1a;
+      color: #e8d5b0;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: .14em;
+      padding: 9px 16px;
+      text-transform: uppercase;
+    }
+ 
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px var(--page-pad);
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .nav-left { display: flex; gap: 28px; }
+    .nav-left a {
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      letter-spacing: .14em;
+      color: #1a1a1a;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .nav-right { display: flex; gap: 20px; align-items: center; }
+    .nav-right svg {
+      width: 19px; height: 19px;
+      cursor: pointer;
+      stroke: #1a1a1a; fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+ 
+    /* Mobile hamburger */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: #1a1a1a;
+    }
+ 
+    /* Mobile menu drawer */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      padding: 20px var(--page-pad);
+      gap: 18px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+ 
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 92vh;
+      min-height: 500px;
+      background: #1e130d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-media {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .7;
+    }
+    /* Fallback pattern shown when no image is set */
+    .hero-fallback {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #3d2b1f 0%, #1a110c 100%);
+    }
+    .hero-fallback-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: .07;
+      background-image: repeating-linear-gradient(45deg, #c9a96e 0, #c9a96e 1px, transparent 0, transparent 50%);
+      background-size: 22px 22px;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(20,10,5,.7) 0%, rgba(20,10,5,.15) 60%, transparent 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      color: #faf8f5;
+      padding: 0 24px;
+    }
+    .hero-content .eyebrow {
+      font-size: 10.5px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 400;
+      margin-bottom: 18px;
+    }
+    .hero-content h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 400;
+      letter-spacing: .04em;
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+    .hero-content h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-content p {
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+    .btn-hero {
+      display: inline-block;
+      color: #faf8f5;
+      font-size: 11.5px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border-bottom: 1.5px solid var(--gold);
+      padding-bottom: 4px;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-hero:hover { color: var(--gold); }
+ 
+    /* ── Section: Products ── */
+    .section-products {
+      padding: 64px var(--page-pad);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 36px;
+    }
+    .section-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: .04em;
+    }
+    .section-header a {
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--gold);
+      padding-bottom: 2px;
+      color: #1a1a1a;
+      transition: color .2s;
+    }
+    .section-header a:hover { color: var(--gold); }
+ 
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .product-card { cursor: pointer; }
+    .product-card:hover .product-img-wrap { opacity: .88; }
+    .product-img-wrap {
+      width: 100%;
+      aspect-ratio: 2/3;
+      overflow: hidden;
+      margin-bottom: 12px;
+      transition: opacity .25s;
+      background: #ede8e0;
+    }
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s ease;
+    }
+    .product-card:hover .product-img-wrap img { transform: scale(1.04); }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+    .product-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      line-height: 1.55;
+    }
+    .product-price {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+ 
+    /* ── Section: Banner Strip ── */
+    .banner-strip {
+      background: var(--dark);
+      color: #e8d5b0;
+      text-align: center;
+      padding: 56px 24px;
+    }
+    .banner-strip h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: .06em;
+      margin-bottom: 14px;
+    }
+    .banner-strip p {
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #9a8a6a;
+      margin-bottom: 28px;
+    }
+    .btn-light {
+      display: inline-block;
+      color: #e8d5b0;
+      font-size: 11.5px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: 1px solid rgba(201,169,110,.5);
+      padding: 12px 32px;
+      transition: background .2s, color .2s;
+    }
+    .btn-light:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+ 
+    /* ── Footer ── */
+    footer {
+      background: var(--dark);
+      color: #e8d5b0;
+      padding: 56px var(--page-pad) 28px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      letter-spacing: .12em;
+      margin-bottom: 12px;
+    }
+    .footer-brand p {
+      font-size: 12.5px;
+      color: #9a8a6a;
+      line-height: 1.75;
+      max-width: 230px;
+    }
+    .footer-col h4 {
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #6a5a3a;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .footer-col a {
+      display: block;
+      color: #b8a880;
+      font-size: 13px;
+      margin-bottom: 10px;
+      letter-spacing: .02em;
+      transition: color .2s;
+    }
+    .footer-col a:hover { color: #e8d5b0; }
+    .footer-newsletter input {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(201,169,110,.25);
+      color: #e8d5b0;
+      padding: 11px 14px;
+      font-size: 12px;
+      width: 100%;
+      margin-bottom: 8px;
+      font-family: 'Montserrat', sans-serif;
+      outline: none;
+      letter-spacing: .04em;
+    }
+    .footer-newsletter input::placeholder { color: #4a3a1a; }
+    .footer-newsletter button {
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 11px 20px;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      width: 100%;
+      transition: opacity .2s;
+    }
+    .footer-newsletter button:hover { opacity: .85; }
+    .footer-bottom {
+      border-top: 1px solid rgba(201,169,110,.12);
+      padding-top: 22px;
+      font-size: 11px;
+      color: #4a3a1a;
+      text-align: center;
+      letter-spacing: .06em;
+    }
+ 
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      :root { --page-pad: 28px; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+ 
+    @media (max-width: 600px) {
+      :root { --page-pad: 18px; }
+ 
+      .nav-left, .nav-right { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-logo { font-size: 18px; }
+ 
+      .hero { height: 80vh; }
+      .hero-content h1 { font-size: 44px; }
+ 
+      .section-products { padding: 44px var(--page-pad); }
+      .section-header h2 { font-size: 26px; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .product-name { font-size: 14px; }
+      .product-desc { display: none; }
+ 
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      footer { padding: 44px var(--page-pad) 24px; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Coming Soon</h1>
+ 
+  <!-- ═══════════════════════════════════════
+       ANNOUNCEMENT BAR — edit text here
+  ═══════════════════════════════════════ -->
+  <div class="announce">Free shipping on orders over $150 · Authentic Bengali Sarees</div>
+ 
+  <!-- ═══════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════ -->
+  <nav>
+    <div class="nav-left">
+      <a href="#products">Shop</a>
+      <a href="#about">About</a>
+    </div>
+    <a href="/" class="nav-logo">Luster Looks</a>
+    <div class="nav-right">
+      <!-- Search icon -->
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <!-- Account icon -->
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <!-- Cart icon -->
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </div>
+    <!-- Mobile hamburger -->
+    <div class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+ 
+  <!-- Mobile drawer -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#products" onclick="toggleMenu()">Shop</a>
+    <a href="#about" onclick="toggleMenu()">About</a>
+  </div>
+ 
+  <!-- ═══════════════════════════════════════
+       HERO SECTION
+       → Replace hero.jpg with your photo
+         inside the /images/ folder.
+         If no image is set the dark pattern
+         background shows automatically.
+  ═══════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-media" id="heroMedia">
+      <!-- Image loads here if hero.jpg exists -->
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="eyebrow">Bengali Heritage · Handcrafted Sarees</p>
+      <h1>Draped in<br><em>Tradition</em></h1>
+      <p>Authentic craftsmanship, worn with pride</p>
+      <a href="#products" class="btn-hero">Shop the Collection</a>
+    </div>
+  </section>
+ 
+  <!-- ═══════════════════════════════════════
+       PRODUCTS SECTION
+  ═══════════════════════════════════════ -->
+  <section class="section-products" id="products">
+    <div class="section-header">
+      <h2>The Collection</h2>
+      <a href="#products">View All</a>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+  </section>
+ 
+  <!-- ═══════════════════════════════════════
+       BRAND BANNER
+  ═══════════════════════════════════════ -->
+  <section class="banner-strip" id="about">
+    <h2>Woven with Love</h2>
+    <p>Each saree tells a story of Bengali artistry</p>
+    <a href="#products" class="btn-light">Explore Now</a>
+  </section>
+ 
+  <!-- ═══════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Luster Looks</div>
+        <p>Celebrating Bengali heritage through handcrafted sarees for every occasion — weddings, festivals, and everyday elegance.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="#">All Sarees</a>
+        <a href="#">Silk Sarees</a>
+        <a href="#">Cotton Sarees</a>
+        <a href="#">Bridal Collection</a>
+        <a href="#">New Arrivals</a>
+      </div>
+      <div class="footer-col footer-newsletter">
+        <h4>Join Our List</h4>
+        <input type="email" placeholder="Your email address" />
+        <button type="button">Subscribe</button>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 Luster Looks. All rights reserved.</div>
+  </footer>
+ 
+ 
+  <script>
+    /* ═══════════════════════════════════════════════════════════
+         ★  EDIT YOUR PRODUCTS HERE  ★
+         This is the ONLY place you need to change anything.
+         To add a product: copy one block, paste it, edit the text.
+         To remove a product: delete the whole { ... } block.
+ 
+         image: put your file in the images/ folder and
+                write the filename here e.g. "images/saree1.jpg"
+    ═══════════════════════════════════════════════════════════ */
+    const products = [
+      {
+        name: "Crimson Banarasi Silk",
+        price: "$145.00",
+        description: "Rich crimson pure silk with gold zari border, perfect for weddings and grand occasions.",
+        image: "images/saree1.jpg"
+      },
+      {
+        name: "Royal Blue Tant",
+        price: "$95.00",
+        description: "Lightweight Bengal tant weave with traditional blue on white motifs. Ideal for festivals.",
+        image: "images/saree2.jpg"
+      },
+      {
+        name: "Emerald Muslin",
+        price: "$110.00",
+        description: "Soft Dhaka muslin with delicate hand-embroidered thread work along the border.",
+        image: "images/saree3.jpg"
+      },
+      {
+        name: "Golden Jamdani",
+        price: "$165.00",
+        description: "Handwoven Jamdani with intricate traditional floral motifs. A true heirloom piece.",
+        image: "images/saree4.jpg"
+      }
+    ];
+    /* ═══════════════════════════════════════════════════════════ */
+ 
+ 
+    /* --- Render products --- */
+    const grid = document.getElementById('productGrid');
+    products.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <div class="product-img-wrap">
+          <img src="${p.image}" alt="${p.name}" onerror="this.parentNode.style.background='#ede8e0';this.style.display='none'" loading="lazy" />
+        </div>
+        <p class="product-name">${p.name}</p>
+        <p class="product-desc">${p.description}</p>
+        <p class="product-price">${p.price}</p>
+      `;
+      grid.appendChild(card);
+    });
+ 
+    /* --- Hero image loader --- */
+    const heroImg = new Image();
+    heroImg.onload = function() {
+      const m = document.getElementById('heroMedia');
+      m.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = 'images/hero.jpg';
+      img.alt = 'Luster Looks';
+      m.appendChild(img);
+    };
+    heroImg.onerror = function() {
+      const m = document.getElementById('heroMedia');
+      m.innerHTML = '<div class="hero-fallback"><div class="hero-fallback-pattern"></div></div>';
+    };
+    heroImg.src = 'images/hero.jpg';
+ 
+    /* --- Mobile menu --- */
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
+ 
