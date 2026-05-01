@@ -646,17 +646,45 @@
     }
  
     /* --- Contact form --- */
-    function submitContact() {
+    async function submitContact() {
       const name = document.getElementById('contactName').value.trim();
       const email = document.getElementById('contactEmail').value.trim();
       const phone = document.getElementById('contactPhone').value.trim();
-      if (!name || !email) { alert('Please fill in your name and email.'); return; }
-      document.getElementById('contactName').value = '';
-      document.getElementById('contactEmail').value = '';
-      document.getElementById('contactPhone').value = '';
-      document.getElementById('contactMessage').value = '';
-      document.getElementById('contactSuccess').classList.add('visible');
-      setTimeout(() => document.getElementById('contactSuccess').classList.remove('visible'), 5000);
+      const message = document.getElementById('contactMessage').value.trim();
+
+      if (!name || !email) {
+        alert('Please fill in your name and email.');
+        return;
+      }
+
+      // Frontend email restriction
+      if (!email.endsWith('@gmail.com') && !email.endsWith('@yahoo.com')) {
+        alert('Please use a Gmail or Yahoo email address.');
+        return;
+      }
+
+      try {
+        const res = await fetch('https://lusterlooks-backend.onrender.com/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, message })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          document.getElementById('contactName').value = '';
+          document.getElementById('contactEmail').value = '';
+          document.getElementById('contactPhone').value = '';
+          document.getElementById('contactMessage').value = '';
+          document.getElementById('contactSuccess').classList.add('visible');
+          setTimeout(() => document.getElementById('contactSuccess').classList.remove('visible'), 5000);
+        } else {
+          alert(result.error || 'Something went wrong. Please try again.');
+        }
+      } catch (err) {
+        alert('Could not reach the server. Please try again later.');
+      }
     }
  
     /* ══════════════════════════════════════
@@ -738,4 +766,3 @@
   </script>
 </body>
 </html>
- 
